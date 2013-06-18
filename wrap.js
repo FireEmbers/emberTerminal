@@ -1,14 +1,16 @@
 var cconv = require('cconv');
 
-var slopeArray = new Array(rows*cols);
-var aspectArray = new Array(rows*cols);
-var clcArray = new Array(rows*cols);
+var slopeArray;
+var aspectArray;
+var clcArray;
 
 module.exports = function(coord, height, width, rows, cols, cb) {
 
-  var dataUnit = [MOISTUREPART, WINDU, WINDDIR];
+  //var dataUnit = [MOISTUREPART, WINDU, WINDDIR];
 
-  
+  slopeArray = new Array(rows*cols);
+  aspectArray = new Array(rows*cols);
+  clcArray = new Array(rows*cols);
 
   var programString;
 
@@ -24,10 +26,10 @@ module.exports = function(coord, height, width, rows, cols, cb) {
 
   cB = cconv(sridA, sridB, cA, f);
 
-  var W = cB[0] - length/2;
-  var E = cB[0] + length/2;
-  var N = cB[1] + width/2;
-  var S = cB[1] - width/2;
+  var W = cB[0] - width/2;
+  var E = cB[0] + width/2;
+  var N = cB[1] + height/2;
+  var S = cB[1] - height/2;
 
   loadClcMap(N, S, E, W, rows, cols, height, width, cb);
 
@@ -35,7 +37,7 @@ module.exports = function(coord, height, width, rows, cols, cb) {
 
 function loadClcMap(N, S, E, W, rows, cols, height, width, cb){
 
-  var getCorine = require('../clcServer');
+  var getCorine = require('./../postgisServer/clcServer');
 
   getCorine( N, S, E, W, rows, cols, onClcLoad );
 
@@ -51,7 +53,7 @@ function loadClcMap(N, S, E, W, rows, cols, height, width, cb){
 
 function loadGrassMaps(N, E, S, W, rows, cols, height, width, cb){
 
-  var grassServer = require('grassServer');
+  var grassServer = require('./../grassServer/grassServer');
 
   grassServer(N, S, E, W, rows, cols, onGrassLoad );
 
