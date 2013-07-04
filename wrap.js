@@ -31,11 +31,11 @@ module.exports = function(coord, height, width, rows, cols, cb) {
   var N = cB[1] + height/2;
   var S = cB[1] - height/2;
 
-  loadClcMap(N, S, E, W, rows, cols, height, width, cb);
+  loadClcMap(N, S, E, W, rows, cols, cb);
 
 }
 
-function loadClcMap(N, S, E, W, rows, cols, height, width, cb){
+function loadClcMap(N, S, E, W, rows, cols, cb){
 
   var getCorine = require('./../postgisServer/clcServer');
 
@@ -45,13 +45,13 @@ function loadClcMap(N, S, E, W, rows, cols, height, width, cb){
 
     clcArray = data;
 
-    loadGrassMaps(N, E, S, W, rows, cols, height, width, cb);
+    loadGrassMaps(N, E, S, W, rows, cols, cb);
 
   }
 
 }
 
-function loadGrassMaps(N, E, S, W, rows, cols, height, width, cb){
+function loadGrassMaps(N, E, S, W, rows, cols, cb){
 
   var grassServer = require('./../grassServer/grassServer');
 
@@ -62,7 +62,7 @@ function loadGrassMaps(N, E, S, W, rows, cols, height, width, cb){
     aspectArray = aspect;
     slopeArray = slope;
 
-    loadEngine(height, width, rows, cols, cb);
+    loadEngine(N-S, E-W, rows, cols, cb);
 
   }
 
@@ -82,9 +82,9 @@ function loadEngine(height, width, rows, cols, cb){
 
       function Run(dataUnit){
 
-        var core = req(1);
+        var engine = req('/home/fsousa/src/crp/embers/engine/src/program.js');
 
-        return core(dataUnit, rows, cols, aspectMap, slopeMap, clcMap, height, width);
+        return engine(dataUnit, rows, cols, aspectMap, slopeMap, clcMap, height, width);
 
       }
 
@@ -94,14 +94,14 @@ function loadEngine(height, width, rows, cols, cb){
       'var cols =' + cols.toString() + ';' +
       'var height =' + height.toString() + ';' +
       'var width =' + width.toString() + ';' +
-      'slopeMap =' + JSON.stringify(slopeArray) + ';' +
-      'aspectMap =' + JSON.stringify(aspectArray) + ';' +
-      'clcMap =' + JSON.stringify(clcArray) + ';';
+      'var slopeMap =' + JSON.stringify(slopeArray) + ';' +
+      'var aspectMap =' + JSON.stringify(aspectArray) + ';' +
+      'var clcMap =' + JSON.stringify(clcArray) + ';';
 
       return string;
     }
 
-    cb(RunString());
+    cb(RunString(), aspectArray, slopeArray, clcArray);
 
   }
 
